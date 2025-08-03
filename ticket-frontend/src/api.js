@@ -42,6 +42,9 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
+    if (originalRequest.url && originalRequest.url.includes('/token/')) {
+      return Promise.reject(error); // 不處理登入 API 的 401
+    }
     if (
       error.response &&
       error.response.status === 401 &&

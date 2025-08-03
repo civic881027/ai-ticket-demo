@@ -2,18 +2,56 @@ import { useState, useEffect } from "react";
 import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Select, message, Modal } from "antd";
+import { jwtDecode } from "jwt-decode";
 
 const { Option } = Select;
 
+
 function TicketCreate() {
+  const [users, setUsers] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        // 根據你的 JWT 結構取用戶 id 欄位名稱
+        setCurrentUserId(decoded.user_id);
+      } catch (e) {
+        console.warn("Decode token failed:", e);
+      }
+    }
+  }, []);
+  // 讀取使用者資料
   useEffect(() => {
     document.title = "建立工單 - 我的工單系統";
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get("users/");
+        setUsers(res.data['results']); 
+      } catch (e) {
+        message.error("載入使用者列表失敗");
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  
+
+
+  useEffect(() => {
+  if (users.length > 0 && currentUserId) {
+    const exists = users.find(u => u.id === currentUserId);
+    if (exists) {
+      form.setFieldsValue({ assigned_to: currentUserId });
+    }
+  }
+}, [users, currentUserId, form]);
   // 當用戶送出表單
   const onFinish = async (values) => {
     // 判斷可空欄位是否皆空，決定是否呈現 AI 使用提示
@@ -86,6 +124,25 @@ function TicketCreate() {
             <Option value="medium">中</Option>
             <Option value="high">高</Option>
             <Option value="urgent">緊急</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="負責人" name="assigned_to" >
+          <Select
+            allowClear
+            placeholder="請選擇負責人"
+            loading={users.length === 0} // 用戶沒載入完成時顯示等待
+            optionFilterProp="children"
+            showSearch
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+          >
+            {users.map(user => (
+              <Option key={user.id} value={user.id}>
+                {user.username}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 

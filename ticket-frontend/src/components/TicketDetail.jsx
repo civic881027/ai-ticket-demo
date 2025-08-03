@@ -10,6 +10,9 @@ function TicketDetail() {
   const [aiLoading, setAILoading] = useState(false);
   const { id } = useParams();
   const [status, setStatus] = useState("");
+  const [assignedTo, setAssignedTo] = useState(null); 
+  const [users, setUsers] = useState([]);  
+
   const navigate = useNavigate();
 
   // 讀取工單資料
@@ -18,13 +21,31 @@ function TicketDetail() {
     api.get(`tickets/${id}/`).then(res => {
       setTicket(res.data);
       setStatus(res.data.status);  // 預設選擇目前狀態
+      setAssignedTo(res.data.assigned_to); // 預設負責人id
     });
   }, [id]);
+
+  // 讀取使用者資料
+  useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get("users/");  
+      setUsers(res.data['results']);
+    } catch {
+      message.error("載入使用者列表失敗");
+    }
+  };
+  fetchUsers();
+  }, []);
 
   const handleStatusChange = (value) => {
     setStatus(value);
   };
 
+  const handleAssignedToChange = (value) => {
+    setAssignedTo(value);
+  };
+  // 更新狀態 API
   const handleStatusUpdate = () => {
     api.patch(`tickets/${id}/`, { status: status })
       .then(res => {
@@ -35,6 +56,18 @@ function TicketDetail() {
         message.error("狀態更新失敗！");
       });
   };
+    // 更新負責人 API
+  const handleAssignedToUpdate = () => {
+    api.patch(`tickets/${id}/`, { assigned_to: assignedTo })
+      .then(res => {
+        setTicket(res.data);
+        message.success("負責人更新成功！");
+      })
+      .catch(() => {
+        message.error("負責人更新失敗！");
+      });
+  };
+
   // 人工回覆
   const handleManualReply = () => {
     if (!reply.trim()) {
@@ -81,6 +114,14 @@ function TicketDetail() {
             <div style={{ fontSize: 14, color: "#808080", margin: "8px 0" }}>
               建立時間：{new Date(ticket.created_at).toLocaleString()}
             </div>
+            {/* 創建者資訊 */}
+            <div style={{ fontSize: 14, color: "#808080", marginBottom: 8 }}>
+              創建者：
+              {ticket.created_by
+                ? `${ticket.created_by.username}`
+                : "未知"}
+            </div>
+
           </Col>
           <Col flex="none">
             <Button onClick={() => navigate('/tickets')}>回列表</Button>
@@ -108,9 +149,37 @@ function TicketDetail() {
             </Button>
           </Space>
         </div>
-      </Card>
+      
 
-      {/* 下方維持原回覆區不變 */}
+      {/* 新增：更換負責人功能 */}
+        <div style={{ marginTop: 24 }}>
+          <Space>
+            <Select
+              value={assignedTo}
+              onChange={handleAssignedToChange}
+              style={{ width: 200 }}
+              allowClear
+              placeholder="請選擇負責人"
+              loading={users.length === 0}
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {users.map(user => (
+                <Option key={user.id} value={user.id}>
+                  {user.username}
+                </Option>
+              ))}
+            </Select>
+            <Button onClick={handleAssignedToUpdate} type="primary" disabled={assignedTo === ticket.assigned_to}>
+              更新負責人
+            </Button>
+          </Space>
+        </div>
+      </Card>
+      
       {/* 所有回覆 */}
       <Card
         title={<span style={{ fontWeight: 600 }}>回覆紀錄</span>}

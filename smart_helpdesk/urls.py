@@ -11,6 +11,8 @@ urlpatterns = [
     # Django Admin
     path('admin/', admin.site.urls),
 
+    # USER API
+    path('api/users/', views.UserListAPIView.as_view(), name='user-list'),
     # Tickets API
     path('api/tickets/', views.TicketListCreateView.as_view(), name='ticket-list-create'),
     path('api/tickets/<int:pk>/', views.TicketDetailView.as_view(), name='ticket-detail'),

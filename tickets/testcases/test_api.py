@@ -85,7 +85,9 @@ def test_ai_reply_api(monkeypatch):
         category="技術問題",
         priority="medium",
         status="open",
-        created_by=user
+        created_by=user,
+        assigned_to=user
+        
     )
 
     # 為避免真的呼叫 Ollama，可 monkeypatch AI 回覆

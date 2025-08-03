@@ -24,40 +24,40 @@ function TicketList() {
   }, []);
 
 
-  const columns = [
-    {
-      title: '標題',
-      dataIndex: 'title',
-      sorter: (a, b) => a.title.localeCompare(b.title),
-    },
-    {
-      title: '分類',
-      dataIndex: 'category',
-      sorter: (a, b) => a.category.localeCompare(b.category),
-    },
-    {
-      title: '優先級',
-      dataIndex: 'priority',
-      sorter: (a, b) => a.priority.localeCompare(b.priority),
-    },
-    {
-      title: '狀態',
-      dataIndex: 'status',
-      sorter: (a, b) => a.status.localeCompare(b.status),
-    },
-    {
-      title: '建立時間',
-      dataIndex: 'created_at',
-      sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
-      render: d => new Date(d).toLocaleString()
-    },
-    {
-      title: '檢視',
-      render: (_, row) => (
-        <Button onClick={() => navigate(`/tickets/${row.id}`)}>詳情</Button>
-      )
-    }
-  ];
+const columns = [
+  {
+    title: '標題',
+    dataIndex: 'title',
+    sorter: (a, b) => a.title.localeCompare(b.title),
+  },
+  {
+    title: '分類',
+    dataIndex: 'category',
+    sorter: (a, b) => a.category.localeCompare(b.category),
+  },
+  {
+    title: '優先級',
+    dataIndex: 'priority',
+    sorter: (a, b) => a.priority.localeCompare(b.priority),
+  },
+  {
+    title: '狀態',
+    dataIndex: 'status',
+    sorter: (a, b) => a.status.localeCompare(b.status),
+  },
+  {
+    title: '建立時間',
+    dataIndex: 'created_at',
+    sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
+    render: d => new Date(d).toLocaleString()
+  },
+  {
+    title: '檢視',
+    render: (_, row) => (
+      <Button onClick={() => navigate(`/tickets/${row.id}`)}>詳情</Button>
+    )
+  }
+];
 
   return (
     <>

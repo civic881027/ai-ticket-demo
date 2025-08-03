@@ -6,20 +6,28 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.db.models import Q
 
 from .models import Ticket, TicketResponse
-from .serializers import TicketSerializer, TicketCreateSerializer, TicketResponseSerializer
+from .serializers import TicketSerializer, TicketCreateSerializer, TicketResponseSerializer, UserSerializer
 from .services import OllamaService
 from .permissions import IsOwnerOrAdmin
 
 # API Views
+class UserListAPIView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
 class TicketListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_staff:
             return Ticket.objects.all()
-        return Ticket.objects.filter(created_by=self.request.user)
+        return Ticket.objects.filter(
+            Q(assigned_to=self.request.user) | Q(created_by=self.request.user)
+        )
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -111,12 +119,15 @@ def generate_ai_response(request, ticket_id):
         if request.user.is_staff:
             ticket = get_object_or_404(Ticket, id=ticket_id)
         else:
-            ticket = get_object_or_404(Ticket, id=ticket_id, created_by=request.user)
+            
+            ticket = get_object_or_404(Ticket, id=ticket_id, assigned_to=request.user)
+            
         
         ollama_service = OllamaService()
         ai_response = ollama_service.generate_response(ticket)
-
+       
         if not ai_response or "抱歉，AI助手暫時無法提供回覆建議，請稍後再試。" in ai_response:
+            
             # 偵測到 AI 回覆為不可用/服務異常
             return Response(
                 {"detail": "AI助手暫時無法提供回覆建議，請稍後再試。"},

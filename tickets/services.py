@@ -80,7 +80,7 @@ class OllamaService:
         """
         cache_key = f"response_{ticket.id}_{ticket.updated_at.timestamp()}"
         cached_response = cache.get(cache_key)
-        
+        #print(cache_key,cached_response)
         if cached_response:
             return cached_response
         
