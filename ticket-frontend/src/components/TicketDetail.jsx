@@ -1,21 +1,40 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Input, List, Tag, message, Card, Space, Divider, Row, Col } from "antd";
+import { Button, Input, List, Tag, message, Card, Space, Divider, Row, Col,Select } from "antd";
+const { Option } = Select;
 
 function TicketDetail() {
   const [ticket, setTicket] = useState(null);
   const [reply, setReply] = useState("");
   const [aiLoading, setAILoading] = useState(false);
   const { id } = useParams();
+  const [status, setStatus] = useState("");
   const navigate = useNavigate();
 
   // 讀取工單資料
   useEffect(() => {
     document.title = "工單詳情 - 我的工單系統";
-    api.get(`tickets/${id}/`).then(res => setTicket(res.data));
+    api.get(`tickets/${id}/`).then(res => {
+      setTicket(res.data);
+      setStatus(res.data.status);  // 預設選擇目前狀態
+    });
   }, [id]);
 
+  const handleStatusChange = (value) => {
+    setStatus(value);
+  };
+
+  const handleStatusUpdate = () => {
+    api.patch(`tickets/${id}/`, { status: status })
+      .then(res => {
+        setTicket(res.data);
+        message.success("狀態更新成功！");
+      })
+      .catch(() => {
+        message.error("狀態更新失敗！");
+      });
+  };
   // 人工回覆
   const handleManualReply = () => {
     if (!reply.trim()) {
@@ -71,11 +90,27 @@ function TicketDetail() {
         <div><b>描述：</b>{ticket.description}</div>
         {(ticket.ai_suggested_category || ticket.ai_suggested_priority) && (
           <div style={{ color: "#868686", marginTop: 8 }}>
-            AI 建議：{ticket.ai_suggested_category || "-"}（優先級 {ticket.ai_suggested_priority || "-" }）
+            AI 建議：{ticket.ai_suggested_category || "-"}（優先級 {ticket.ai_suggested_priority || "-"}）
           </div>
         )}
+
+        {/* 新增區塊：更換狀態 */}
+        <div style={{ marginTop: 24 }}>
+          <Space>
+            <Select value={status} onChange={handleStatusChange} style={{ width: 160 }}>
+              <Option value="open">開啟</Option>
+              <Option value="in_progress">處理中</Option>
+              <Option value="resolved">已解決</Option>
+              <Option value="closed">已關閉</Option>
+            </Select>
+            <Button onClick={handleStatusUpdate} type="primary" >
+              更新狀態
+            </Button>
+          </Space>
+        </div>
       </Card>
 
+      {/* 下方維持原回覆區不變 */}
       {/* 所有回覆 */}
       <Card
         title={<span style={{ fontWeight: 600 }}>回覆紀錄</span>}
@@ -84,7 +119,7 @@ function TicketDetail() {
       >
         <List
           dataSource={ticket.responses}
-          locale={{emptyText: "目前尚無回覆"}}
+          locale={{ emptyText: "目前尚無回覆" }}
           renderItem={res => (
             <List.Item>
               <Space align="baseline">
@@ -93,7 +128,7 @@ function TicketDetail() {
                   : <Tag color="green">人工</Tag>
                 }
                 <b>{res.created_by.username}</b>
-                <span style={{color:"#888"}}>{new Date(res.created_at).toLocaleString()}</span>
+                <span style={{ color: "#888" }}>{new Date(res.created_at).toLocaleString()}</span>
               </Space>
               <div style={{ marginLeft: "12px", flex: 1 }}>{res.response_text}</div>
             </List.Item>

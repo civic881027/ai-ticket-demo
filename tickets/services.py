@@ -16,7 +16,7 @@ class OllamaService:
         """
         cache_key = f"categorize_{hash(title + description)}"
         cached_result = cache.get(cache_key)
-        print('cached_result',cached_result)
+        #print('cached_result',cached_result)
         if cached_result:
             return cached_result
         
@@ -36,7 +36,7 @@ class OllamaService:
         """
         
         try:
-            print('prompt',prompt)
+            #print('prompt',prompt)
             response = self.client.chat(
                 model=self.model,
                 messages=[{
@@ -47,7 +47,7 @@ class OllamaService:
             
             # 解析回應
             response_text = response['message']['content']
-            print(f"Ollama 回應內容: {response_text}")  # 新增印出調試
+            #print(f"Ollama 回應內容: {response_text}")  # 新增印出調試
             # 嘗試解析JSON
             try:
                 result = json.loads(response_text)
@@ -67,7 +67,7 @@ class OllamaService:
             return default_result
             
         except Exception as e:
-            print(f"Ollama服務錯誤: {e}")
+            #print(f"Ollama服務錯誤: {e}")
             return {
                 'category': '一般諮詢',
                 'priority': 'medium',

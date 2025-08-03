@@ -139,11 +139,7 @@ def generate_ai_response(request, ticket_id):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-<<<<<<< HEAD
 #Web Views (Traditional Django Views)
-=======
-# Web Views (Traditional Django Views)
->>>>>>> 9c2fbf7 (Initial commit: AI工單系統)
 # @login_required
 # def ticket_list(request):
 #     """工單列表頁面"""
