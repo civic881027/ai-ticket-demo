@@ -1,0 +1,59 @@
+warning: in the working copy of 'ticket-frontend/package.json', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/db.sqlite3 b/db.sqlite3[m
+[1mindex 96863dc..1003fce 100644[m
+Binary files a/db.sqlite3 and b/db.sqlite3 differ
+[1mdiff --git a/smart_helpdesk/settings.py b/smart_helpdesk/settings.py[m
+[1mindex 9533716..34b8a69 100644[m
+[1m--- a/smart_helpdesk/settings.py[m
+[1m+++ b/smart_helpdesk/settings.py[m
+[36m@@ -26,7 +26,7 @@[m [mSECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')[m
+ # SECURITY WARNING: don't run with debug turned on in production![m
+ DEBUG = config('DEBUG', default=True, cast=bool)[m
+ [m
+[31m-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.render.com'][m
+[32m+[m[32mALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.render.com','backend'][m
+ [m
+ [m
+ # Application definition[m
+[1mdiff --git a/ticket-frontend/package.json b/ticket-frontend/package.json[m
+[1mindex e6bdf00..46b330d 100644[m
+[1m--- a/ticket-frontend/package.json[m
+[1m+++ b/ticket-frontend/package.json[m
+[36m@@ -2,7 +2,6 @@[m
+   "name": "ticket-frontend",[m
+   "version": "0.1.0",[m
+   "private": true,[m
+[31m-  "proxy": "http://127.0.0.1:8000",[m
+   "dependencies": {[m
+     "antd": "^5.26.7",[m
+     "axios": "^1.11.0",[m
+[1mdiff --git a/tickets/__pycache__/views.cpython-39.pyc b/tickets/__pycache__/views.cpython-39.pyc[m
+[1mindex 73792ba..1dc8c30 100644[m
+Binary files a/tickets/__pycache__/views.cpython-39.pyc and b/tickets/__pycache__/views.cpython-39.pyc differ
+[1mdiff --git a/tickets/services.py b/tickets/services.py[m
+[1mindex aaa8423..95c5b58 100644[m
+[1m--- a/tickets/services.py[m
+[1m+++ b/tickets/services.py[m
+[36m@@ -97,7 +97,9 @@[m [mclass OllamaService:[m
+         2. 可能的解決方案或後續步驟[m
+         3. 預期的處理時間[m
+         [m
+[31m-        回覆應該以繁體中文撰寫，語氣親切專業。[m
+[32m+[m[32m        回覆全部以 繁體中文 撰寫，語氣親切專業。[m
+[32m+[m[32m        避免中英文混雜的回應。[m
+[32m+[m[41m        [m
+         """[m
+         [m
+         try:[m
+[1mdiff --git a/tickets/views.py b/tickets/views.py[m
+[1mindex a4896d9..594a4fb 100644[m
+[1m--- a/tickets/views.py[m
+[1m+++ b/tickets/views.py[m
+[36m@@ -119,7 +119,6 @@[m [mdef generate_ai_response(request, ticket_id):[m
+         if request.user.is_staff:[m
+             ticket = get_object_or_404(Ticket, id=ticket_id)[m
+         else:[m
+[31m-            [m
+             ticket = get_object_or_404(Ticket, id=ticket_id, assigned_to=request.user)[m
+             [m
+         [m

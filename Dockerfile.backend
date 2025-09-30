@@ -1,0 +1,14 @@
+# Dockerfile.backend
+FROM python:3.9.7-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python manage.py migrate
+
+
+# 預設啟動行為透過 docker-compose 指定

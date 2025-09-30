@@ -119,7 +119,6 @@ def generate_ai_response(request, ticket_id):
         if request.user.is_staff:
             ticket = get_object_or_404(Ticket, id=ticket_id)
         else:
-            
             ticket = get_object_or_404(Ticket, id=ticket_id, assigned_to=request.user)
             
         
