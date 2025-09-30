@@ -1,0 +1,7 @@
+ticket-frontend/
+node_modules/
+.git
+__pycache__/
+*.pyc
+staticfiles/
+venv/

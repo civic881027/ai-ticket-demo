@@ -6,7 +6,14 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
+COPY smart_helpdesk/ smart_helpdesk/
+COPY tickets/ tickets/
+COPY manage.py ./
+COPY .env.docker ./
+COPY requirements.txt ./
+COPY db.sqlite3 ./
+COPY pytest.ini ./
+
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python manage.py migrate
 
